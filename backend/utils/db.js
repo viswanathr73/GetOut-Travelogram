@@ -25,4 +25,3 @@ export default   connectDB;
 
 
 
-//mongodb cluster  :mongodb+srv://viswanathr73:<db_password>@cluster0.szeiojs.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
