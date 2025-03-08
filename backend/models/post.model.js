@@ -23,4 +23,5 @@ const postSchema= new mongoose.Schema({
     }],
 });
 
-export default mongoose.model("Post",postSchema);    //check 47:47 sec
+// export default mongoose.model("Post",postSchema);    //check 47:47 sec
+export const Post = mongoose.model('Post',postSchema);
