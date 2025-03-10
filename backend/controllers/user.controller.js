@@ -4,7 +4,7 @@ import bcrypt from 'bcryptjs';
 import jwt from "jsonwebtoken";
 import getDataUri from "../utils/datauri.js";
 import cloudinary from "../utils/cloudinary.js";
-
+import {Post} from '../models/post.model.js';
 
 
 
@@ -56,21 +56,34 @@ export const login = async (req, res) => {
             return res.status(401).json({ message: "invalid credentials", sucess: false });
         }
 
+
+        const token = await jwt.sign({ userId: user._id }, process.env.SECRET_KEY, { expiresIn: '1d' });
+
+        //populate each post if in the post array
+        const populatedPosts = await Promise.all(
+            user.posts.map(async (postId) => {
+                const post = await Post.findById(postId);
+                if (post.author.equals(user._id)) {
+                    return post;
+                }
+                return null;
+            })
+        )
+
         user = {
             _id: user._id,
             username: user.username,
             email: user.email,
-            profilePicture: user.profilepicture,
+            profilePicture: user.profilePicture,
             bio: user.bio,
+            gender: user.gender,
             followers: user.followers,
             following: user.following,
-            post: user.posts,
+            posts: populatedPosts
         }
 
 
-
-        const token = await jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
-        return res.cookie('token', token, { httpOnly: true, sameSite: 'strict', maxAge: 1 * 24 * 60 * 60 * 1000 }).json({
+      return res.cookie('token', token, { httpOnly: true, sameSite: 'strict', maxAge: 1 * 24 * 60 * 60 * 1000 }).json({
             message: `Welcome back ${user.username}`, success: true, user
         });
 
