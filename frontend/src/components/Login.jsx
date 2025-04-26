@@ -3,11 +3,12 @@ import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import axios from "axios";
 import { toast } from "sonner";
-import { Link, useNavigate } from "react-router-dom";
+import { Link,useNavigate } from "react-router-dom";
+import { Loader, Loader2 } from "lucide-react";
 
-const Signup = () => {
+const Login = () => {
   const [input, setInput] = useState({
-    username: "",
+   
     email: "",
     password: "",
   });
@@ -25,7 +26,7 @@ const Signup = () => {
     try {
       setLoading(true);
       const res = await axios.post(
-        "http://localhost:8000/api/v1/user/register",
+        "http://localhost:8000/api/v1/user/login",
         input,
         {
           headers: {
@@ -35,13 +36,13 @@ const Signup = () => {
         }
       );
       if (res.data.success) {
-        navigate("/login");
+        navigate("/");
         toast.success(res.data.message);
         setInput({
-          username: "",
+    
           email: "",
           password: "",
-        });
+        })
       }
     } catch (error) {
       toast.error(error.response.data.message);
@@ -58,18 +59,9 @@ const Signup = () => {
       >
         <div className="my-4">
           <h1 className="text-center font-bold text-xl">LOGO</h1>
-          <p>Signup to see photos & videps from your friends</p>
+          <p> Login to see photos & videps from your friends</p>
         </div>
-        <div>
-          <span className="font-medium">Username</span>
-          <Input
-            type="text"
-            name="username"
-            value={input.username}
-            onChange={changeEventHandler}
-            className="focus-visible:ring-transparent my-2"
-          />
-        </div>
+       
         <div>
           <span className="font-medium">Email</span>
           <Input
@@ -92,16 +84,17 @@ const Signup = () => {
         </div>
         {loading ? (
           <Button>
-            <Loader2 className="mr-2  w-4 animate-spin" />
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             Please wait...
           </Button>
         ) : (
-          <Button type="submit">Signup</Button>
+          <Button type="submit"  >Login</Button>
         )}
+
         <span className="text-center">
-          Already have an account?
-          <Link to="/login" className="text-blue-600">
-            Login
+          Doesn't have an account?
+          <Link to="/signup" className="text-blue-600">
+            Signup
           </Link>
         </span>
       </form>
@@ -109,4 +102,4 @@ const Signup = () => {
   );
 };
 
-export default Signup;
+export default Login;

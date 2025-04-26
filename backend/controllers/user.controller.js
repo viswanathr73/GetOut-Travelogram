@@ -16,12 +16,12 @@ export const register = async (req, res) => {
         const { username, email, password } = req.body;
         //condition for checking the values entered by the user        
         if (!username || !email || !password) {
-            return res.status(401).json({ message: "someting missing,please check!", sucess: false });
+            return res.status(401).json({ message: "someting missing,please check!", success: false });
         }
         //for checking the mail id       
         const user = await User.findOne({ email });
         if (user) {
-            return res.status(409).json({ message: "email already exists", sucess: false });
+            return res.status(409).json({ message: "email already exists", success: false });
         };
         const hashedPassword = await bcrypt.hash(password, 10);
         await User.create({
@@ -29,7 +29,7 @@ export const register = async (req, res) => {
             email,
             password: hashedPassword
         });
-        return res.status(200).json({ message: "Account created successfully", sucess: true });
+        return res.status(200).json({ message: "Account created successfully", success: true });
 
     } catch (error) {
         console.log('error in user registration');
@@ -43,21 +43,24 @@ export const register = async (req, res) => {
 
 export const login = async (req, res) => {
     try {
+        console.log("Login attempt:", req.body);
         const { email, password } = req.body;
         if (!email || !password) {
-            return res.status(401).json({ message: "someting missing,please check!", sucess: false });
+            return res.status(401).json({ message: "someting missing,please check!", success: false });
         }
         let user = await User.findOne({ email });
         if (!user) {
-            return res.status(404).json({ message: "user not found", sucess: false });
+            console.error("User not found");
+            return res.status(404).json({ message: "user not found", success: false });
         }
         const isPasswordMatch = await bcrypt.compare(password, user.password);
         if (!isPasswordMatch) {
-            return res.status(401).json({ message: "invalid credentials", sucess: false });
+            console.error("Invalid password");
+            return res.status(401).json({ message: "invalid credentials",success: false });
         }
 
 
-        const token = await jwt.sign({ userId: user._id }, process.env.SECRET_KEY, { expiresIn: '1d' });
+        const token = await jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
 
         //populate each post if in the post array
         const populatedPosts = await Promise.all(
@@ -89,7 +92,7 @@ export const login = async (req, res) => {
 
 
     } catch (error) {
-        console.log(error in user - login);
+        console.log("error in user - login", error);
 
     }
 }
